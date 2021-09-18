@@ -2,26 +2,39 @@ pragma solidity ^0.5.16;
 pragma experimental ABIEncoderV2;
 
 contract MyLunch {
-    string[] public foodNameList;
-    mapping(string => uint256) foodCount;
+    string[] public foodList;
+    mapping(string => uint256) private foodVoted;
+    mapping(string => bool) private wasAdded;
 
     constructor(string[] memory initialFoodNameList) public {
-        foodNameList = initialFoodNameList;
+        //initial food list
+        foodList = initialFoodNameList;
+
+        //initial food was added
+        for (uint256 i = 0; i < initialFoodNameList.length; i++) {
+            wasAdded[initialFoodNameList[i]] = true;
+        }
     }
 
-    function getFoodNameListCount() public view returns (uint256) {
-        return foodNameList.length;
+    function getFoodCount() public view returns (uint256) {
+        return foodList.length;
     }
 
-    function getVoteFoodCount(string memory foodName)
+    function getVotedFoodByName(string memory foodName)
         public
         view
         returns (uint256)
     {
-        return foodCount[foodName];
+        return foodVoted[foodName];
     }
 
     function voteFoodByName(string memory foodName) public {
-        foodCount[foodName] = foodCount[foodName] + 1;
+        foodVoted[foodName] = foodVoted[foodName] + 1;
+    }
+
+    function addFood(string memory foodName) public {
+        require(!wasAdded[foodName], "food was added");
+        foodList.push(foodName);
+        wasAdded[foodName] = true;
     }
 }
